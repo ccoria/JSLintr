@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+
+FIND=/usr/bin/find
+EGREP=/bin/egrep
+SRCROOT=${SRCROOT:-./}
+CHMOD=/bin/chmod
+JSLINT=${SRCROOT}/bin/jslint
+
+$( ${CHMOD} u+x ${JSLINT})
+
+echo -e "\n====+> Starting JSLint. \n\n    \"WARNING! JSLint will hurt your feelings.\" - Douglas Crockford \n"
+
+counter=0
+for M in $( ${FIND} ${SRCROOT}/frontend/src/public/js/app/ -type f -name '*.js' | ${EGREP} -v '\.svn' );\
+do\
+    counter=$(($counter+1));\
+	${JSLINT} "${M}" ${VERBOSE};\
+done
+
+echo -e "\n\n JSLint: ${counter} tests done! \n"

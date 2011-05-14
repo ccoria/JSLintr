@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+MKTEMP=${MKTEMP:-/bin/mktemp}
+SRCROOT=${SRCROOT:-./}
+
+function runjslint (){
+  TOANALYZE="${1}"
+  REALFNAME="${2}"
+
+  echo "=========================================================="
+  echo " - analyzing ${REALFNAME} "
+  echo ""
+  java -jar ${SRCROOT}/bin/rhino.jar ${SRCROOT}/bin//rhino_jslint.js "${TOANALYZE}" | /bin/sed "s,${TOANALYZE},${REALFNAME},"
+  echo "=========================================================="
+  echo ""
+}
+
+TEMPFILE=$(${MKTEMP} /tmp/jslint.XXXXXXXXXX) && {
+  echo "/*jslint white:false, nomen: true, debug: false, plusplus: true, eqeqeq: true, bitwise: true, onevar: true */" > "${TEMPFILE}"
+  /bin/cat "${1}" >> "${TEMPFILE}"
+  runjslint "${TEMPFILE}" "${1}"
+  /bin/rm -f "${TEMPFILE}"
+}

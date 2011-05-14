@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+VERBOSE=${2}
+
+MKTEMP=${MKTEMP:-/bin/mktemp}
+SRCROOT=${SRCROOT:-./}
+
+GREEN="\e[0;32m"
+RED="\e[0;31m"
+NC="\e[0m"
+
+function has_jslint_errors () {
+  LINTRESULTS="${1}"
+
+  JSLINT_INDEX=$(expr "$LINTRESULTS" : "jslint")
+
+  if [ "$JSLINT_INDEX" -eq 0 ]
+  then 
+      return 0
+  else
+      return 1
+  fi 
+}
+
+function verbose_output () {
+  # naming parameters
+  FILENAME="${1}"
+  LINTRESULTS="${2}"
+
+  if has_jslint_errors "$LINTRESULTS"
+  then
+      RESULT="${RED}FAIL${NC} \n\n{$LINTRESULTS}\n"
+  else
+      RESULT="${GREEN}OK${NC}"
+  fi
+
+  echo -e "${FILENAME}: ${RESULT}"
+}
+
+function concise_output () {
+  # naming parameters
+  FILENAME="${1}"
+  LINTRESULTS="${2}"
+
+  if has_jslint_errors "$LINTRESULTS"
+  then
+      RESULT="${RED}FAIL${NC} \n\n${FILENAME}:\n\n{$LINTRESULTS}\n\n"
+  else
+      RESULT="${GREEN}.${NC}"
+  fi
+
+  echo -ne "${RESULT}"
+}
+
+function runjslint () {
+  # naming parameters
+  TOANALYZE="${1}"
+  REALFNAME="${2}"
+
+  LINT_RESULT=$(java -jar ${SRCROOT}/bin/rhino.jar ${SRCROOT}/bin//rhino_jslint.js "${TOANALYZE}" | /bin/sed "s,${TOANALYZE},${REALFNAME},")
+
+  FILENAME_TRASH="${PWD}"
+  POS=$(expr match $REALFNAME "$FILENAME_TRASH")
+  FNAME=".${REALFNAME:$POS}"
+
+  if [ "$VERBOSE" -eq 0 ]
+  then
+      concise_output "${FNAME}" "${LINT_RESULT}"
+  else
+      verbose_output "${FNAME}" "${LINT_RESULT}"
+  fi
+}
+
+TEMPFILE=$(${MKTEMP} /tmp/jslint.XXXXXXXXXX) && {
+  echo "/*jslint white:false, nomen: true, debug: false, plusplus: true, eqeqeq: true, bitwise: true, onevar: true */" > "${TEMPFILE}"
+  /bin/cat "${1}" >> "${TEMPFILE}"
+  runjslint "${TEMPFILE}" "${1}"
+  /bin/rm -f "${TEMPFILE}"
+}
