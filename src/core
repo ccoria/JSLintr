@@ -2,8 +2,15 @@
 
 VERBOSE=${2}
 
-MKTEMP=${MKTEMP:-/bin/mktemp}
 SRCROOT=${SRCROOT:-./}
+
+MKTEMP=${MKTEMP:-/usr/bin/mktemp}
+SED=${MKTEMP:-/usr/bin/sed}
+
+RHINO=bin/js.jar
+JSLINT=JSLint/jslint.js
+
+OPTIONS='white: false, nomen: true, debug: false, rhino: true, plusplus: true, eqeqeq: true, bitwise: true, onevar: true'
 
 GREEN="\e[0;32m"
 RED="\e[0;31m"
@@ -57,7 +64,7 @@ function runjslint () {
   TOANALYZE="${1}"
   REALFNAME="${2}"
 
-  LINT_RESULT=$(java -jar ${SRCROOT}/bin/rhino.jar ${SRCROOT}/bin//rhino_jslint.js "${TOANALYZE}" | /bin/sed "s,${TOANALYZE},${REALFNAME},")
+  LINT_RESULT=$(java -jar ${RHINO} ${JSLINT} "${TOANALYZE}" | ${SED} "s,${TOANALYZE},${REALFNAME},")
 
   FILENAME_TRASH="${PWD}"
   POS=$(expr match $REALFNAME "$FILENAME_TRASH")
@@ -72,8 +79,11 @@ function runjslint () {
 }
 
 TEMPFILE=$(${MKTEMP} /tmp/jslint.XXXXXXXXXX) && {
-  echo "/*jslint white:false, nomen: true, debug: false, plusplus: true, eqeqeq: true, bitwise: true, onevar: true */" > "${TEMPFILE}"
+  echo "/*jslint ${OPTIONS} */" > "${TEMPFILE}"
   /bin/cat "${1}" >> "${TEMPFILE}"
-  runjslint "${TEMPFILE}" "${1}"
-  /bin/rm -f "${TEMPFILE}"
+  echo "java -jar ${RHINO} ${JSLINT} ${TEMPFILE}"
+  OUT=$(java -jar ${RHINO} ${JSLINT} "${TEMPFILE}")
+  echo "out: ${OUT}"
+  #runjslint "${TEMPFILE}" "${1}"
+  #/bin/rm -f "${TEMPFILE}"
 }
