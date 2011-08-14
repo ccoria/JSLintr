@@ -1,4 +1,3 @@
-/*jslint sloppy:true, white:false, nomen: true, debug: false, plusplus: true, eqeqeq: true, bitwise: true, onevar: true */
 
 var init_ui = function (lib) {
     var test = 1;

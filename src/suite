@@ -1,21 +1,23 @@
 #!/usr/bin/env bash
 
+DIR=${1}
 
 FIND=/usr/bin/find
-EGREP=/bin/egrep
-SRCROOT=${SRCROOT:-./}
-CHMOD=/bin/chmod
-JSLINT=${SRCROOT}/bin/jslint
+EGREP=/usr/bin/egrep
+PWD=/bin/pwd
 
-$( ${CHMOD} u+x ${JSLINT})
+LOCALDIR=$(${PWD})
+SRCROOT=${DIR:-LOCALDIR}
+CHMOD=/bin/chmod
+JSLINTR=src/core
 
 echo -e "\n====+> Starting JSLint. \n\n    \"WARNING! JSLint will hurt your feelings.\" - Douglas Crockford \n"
 
 counter=0
-for M in $( ${FIND} ${SRCROOT}/frontend/src/public/js/app/ -type f -name '*.js' | ${EGREP} -v '\.svn' );\
+for M in $( ${FIND} ${SRCROOT} -type f -name '*.js' | ${EGREP} -v '\.svn' );\
 do\
     counter=$(($counter+1));\
-	${JSLINT} "${M}" ${VERBOSE};\
+	 ${JSLINTR} "${M}" ${VERBOSE};\
 done
 
-echo -e "\n\n JSLint: ${counter} tests done! \n"
+echo -e "\n\n===+> JSLintr Complete: ${counter} tests done! \n"

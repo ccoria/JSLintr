@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-VERBOSE=${2}
+FILE_NAME=${1}
+VERBOSE_PARAM=${2}
+VERBOSE=${VERBOSE_PARAM:-1}
 
 SRCROOT=${SRCROOT:-./}
 
@@ -8,9 +10,10 @@ MKTEMP=${MKTEMP:-/usr/bin/mktemp}
 SED=${MKTEMP:-/usr/bin/sed}
 
 RHINO=bin/js.jar
-JSLINT=JSLint/jslint.js
+JSLINTR=bin/jslintr.js
+JSLINT=bin/jslint.js
 
-OPTIONS='white: false, nomen: true, debug: false, rhino: true, plusplus: true, eqeqeq: true, bitwise: true, onevar: true'
+OPTIONS='sloppy: true, white:false, nomen:true, debug:false, plusplus:true, eqeqeq:true, bitwise:true, onevar:true'
 
 GREEN="\e[0;32m"
 RED="\e[0;31m"
@@ -19,7 +22,7 @@ NC="\e[0m"
 function has_jslint_errors () {
   LINTRESULTS="${1}"
 
-  JSLINT_INDEX=$(expr "$LINTRESULTS" : "jslint")
+  JSLINT_INDEX=$(expr "$LINTRESULTS" : "OK")
 
   if [ "$JSLINT_INDEX" -eq 0 ]
   then 
@@ -41,7 +44,7 @@ function verbose_output () {
       RESULT="${GREEN}OK${NC}"
   fi
 
-  echo -e "${FILENAME}: ${RESULT}"
+  printf "${FILENAME}: ${RESULT}"
 }
 
 function concise_output () {
@@ -51,24 +54,34 @@ function concise_output () {
 
   if has_jslint_errors "$LINTRESULTS"
   then
-      RESULT="${RED}FAIL${NC} \n\n${FILENAME}:\n\n{$LINTRESULTS}\n\n"
+      RESULT="${RED}FAIL${NC} - ${FILENAME}:\n\n$LINTRESULTS\n\n"
   else
       RESULT="${GREEN}.${NC}"
   fi
 
-  echo -ne "${RESULT}"
+  printf "${RESULT}"
 }
 
 function runjslint () {
   # naming parameters
-  TOANALYZE="${1}"
+  TO_ANALYZE="${1}"
   REALFNAME="${2}"
 
-  LINT_RESULT=$(java -jar ${RHINO} ${JSLINT} "${TOANALYZE}" | ${SED} "s,${TOANALYZE},${REALFNAME},")
+  #LINT_RESULT=$(java -jar ${RHINO} ${JSLINT} "${TOANALYZE}" | ${SED} "s,${TOANALYZE},${REALFNAME},")
+  LINT_RESULT=$(java -jar ${RHINO} -f ${JSLINT} ${JSLINTR} ${TO_ANALYZE})
 
-  FILENAME_TRASH="${PWD}"
-  POS=$(expr match $REALFNAME "$FILENAME_TRASH")
-  FNAME=".${REALFNAME:$POS}"
+  #echo "${LINT_RESULT}"
+  FNAME=$REALFNAME
+
+  #FILENAME_TRASH="${PWD}"
+  #POS=$(expr match "$REALFNAME" "'"${FILENAME_TRASH}"'")
+  #echo "pos: $POS"
+  #FNAME=".${REALFNAME:$POS}"
+  #echo "FNAME: ${FNAME}"
+  
+  concise_output "${FNAME}" "${LINT_RESULT}"
+
+  return
 
   if [ "$VERBOSE" -eq 0 ]
   then
@@ -80,10 +93,10 @@ function runjslint () {
 
 TEMPFILE=$(${MKTEMP} /tmp/jslint.XXXXXXXXXX) && {
   echo "/*jslint ${OPTIONS} */" > "${TEMPFILE}"
-  /bin/cat "${1}" >> "${TEMPFILE}"
-  echo "java -jar ${RHINO} ${JSLINT} ${TEMPFILE}"
-  OUT=$(java -jar ${RHINO} ${JSLINT} "${TEMPFILE}")
-  echo "out: ${OUT}"
-  #runjslint "${TEMPFILE}" "${1}"
+  /bin/cat "${FILE_NAME}" >> "${TEMPFILE}"
+  #echo "java -jar ${RHINO} -f ${JSLINT} ${JSLINTR} ${TEMPFILE}"
+  #OUT=$(java -jar ${RHINO} -f ${JSLINT} ${JSLINTR} ${TEMPFILE})
+  #echo "${OUT}"
+  runjslint "${TEMPFILE}" "${FILE_NAME}"
   #/bin/rm -f "${TEMPFILE}"
 }
