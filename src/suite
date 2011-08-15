@@ -1,23 +1,48 @@
 #!/usr/bin/env bash
 
-DIR=${1}
-
+###
+# Setting up bins
+#
 FIND=/usr/bin/find
 EGREP=/usr/bin/egrep
 PWD=/bin/pwd
-
-LOCALDIR=$(${PWD})
-SRCROOT=${DIR:-LOCALDIR}
 CHMOD=/bin/chmod
 JSLINTR=src/core
 
-echo -e "\n====+> Starting JSLint. \n\n    \"WARNING! JSLint will hurt your feelings.\" - Douglas Crockford \n"
+###
+# Main function
+#
+function start_jslintr () {
+	DIR=${1}
+	LOCALDIR=$(${PWD})
+	SRCROOT=${DIR:-LOCALDIR}
+		
+    echo -e "\n====+> Starting JSLint. \n\n    \"WARNING! JSLint will hurt your feelings.\" - Douglas Crockford \n"
 
-counter=0
-for M in $( ${FIND} ${SRCROOT} -type f -name '*.js' | ${EGREP} -v '\.svn' );\
-do\
-    counter=$(($counter+1));\
-	 ${JSLINTR} "${M}" ${VERBOSE};\
-done
+    counter=0
+    for M in $( ${FIND} ${SRCROOT} -type f -name '*.js' | ${EGREP} -v '\.svn' );\
+    do\
+        counter=$(($counter+1));\
+  	   ${JSLINTR} "${M}" ${VERBOSE_MODE};\
+    done
 
-echo -e "\n\n===+> JSLintr Complete: ${counter} tests done! \n"
+    echo -e "\n\n===+> JSLintr Complete: ${counter} tests done! \n"
+}
+
+	
+###
+# Verifying optionals
+#
+
+if [ "$1" == "-v" ]; then
+	shift # shifting parameters index
+	export VERBOSE_MODE=1
+else
+	export VERBOSE_MODE=0
+fi
+
+if [ "$1" == "" ]; then
+	echo "usage: jslintr [-v] /directory/name/ "
+else
+	start_jslintr "$1"
+fi

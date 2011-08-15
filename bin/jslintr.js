@@ -11,6 +11,6 @@ if (lint_was_ok) {
 	print(errors.length + " errors found:\n")
 	
 	for (var i = 0; i < errors.length; i++) {
-		print(errors[i].reason);
+		print("\t" + errors[i].reason);
 	}
 }

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 FILE_NAME=${1}
-VERBOSE_PARAM=${2}
-VERBOSE=${VERBOSE_PARAM:-1}
+VERBOSE_MODE=${2}
+VERBOSE=${VERBOSE_MODE:-1}
 
 SRCROOT=${SRCROOT:-./}
 
@@ -39,9 +39,9 @@ function verbose_output () {
 
   if has_jslint_errors "$LINTRESULTS"
   then
-      RESULT="${RED}FAIL${NC} \n\n{$LINTRESULTS}\n"
+      RESULT="${RED}FAIL${NC} - $LINTRESULTS\n\n"
   else
-      RESULT="${GREEN}OK${NC}"
+      RESULT="${GREEN}OK${NC}\n"
   fi
 
   printf "${FILENAME}: ${RESULT}"
@@ -54,7 +54,7 @@ function concise_output () {
 
   if has_jslint_errors "$LINTRESULTS"
   then
-      RESULT="${RED}FAIL${NC} - ${FILENAME}:\n\n$LINTRESULTS\n\n"
+      RESULT="${RED}FAIL${NC} at ${FILENAME} - $LINTRESULTS\n\n"
   else
       RESULT="${GREEN}.${NC}"
   fi
@@ -78,10 +78,7 @@ function runjslint () {
   #echo "pos: $POS"
   #FNAME=".${REALFNAME:$POS}"
   #echo "FNAME: ${FNAME}"
-  
-  concise_output "${FNAME}" "${LINT_RESULT}"
 
-  return
 
   if [ "$VERBOSE" -eq 0 ]
   then
