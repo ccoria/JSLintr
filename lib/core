@@ -4,16 +4,16 @@ FILE_NAME=${1}
 VERBOSE_MODE=${2}
 VERBOSE=${VERBOSE_MODE:-1}
 
-SRCROOT=${SRCROOT:-./}
+MKTEMP=mktemp
+SED=sed
+CAT=cat
+RM=rm
 
-MKTEMP=${MKTEMP:-/usr/bin/mktemp}
-SED=${MKTEMP:-/usr/bin/sed}
+RHINO="$JSLINTR_ROOT/rhino/js.jar"
+JSLINT="$JSLINTR_ROOT/jslint/jslint.js"
+RHINO_JSLINT="$JSLINTR_ROOT/rhino_jslint.js"
 
-RHINO=bin/js.jar
-JSLINTR=bin/jslintr.js
-JSLINT=bin/jslint.js
-
-OPTIONS='sloppy: true, white:false, nomen:true, debug:false, plusplus:true, eqeqeq:true, bitwise:true, onevar:true'
+OPTIONS='sloppy:true, white:false, nomen:true, debug:false, plusplus:true, eqeqeq:true, bitwise:true, onevar:true'
 
 GREEN="\e[0;32m"
 RED="\e[0;31m"
@@ -44,7 +44,7 @@ function verbose_output () {
       RESULT="${GREEN}OK${NC}\n"
   fi
 
-  printf "${FILENAME}: ${RESULT}"
+  printf "$(ls ${FILENAME}): ${RESULT}"
 }
 
 function concise_output () {
@@ -64,36 +64,23 @@ function concise_output () {
 
 function runjslint () {
   # naming parameters
-  TO_ANALYZE="${1}"
-  REALFNAME="${2}"
+  TEMP_FILE="${1}"
+  REAL_FILE="${2}"
 
-  #LINT_RESULT=$(java -jar ${RHINO} ${JSLINT} "${TOANALYZE}" | ${SED} "s,${TOANALYZE},${REALFNAME},")
-  LINT_RESULT=$(java -jar ${RHINO} -f ${JSLINT} ${JSLINTR} ${TO_ANALYZE})
-
-  #echo "${LINT_RESULT}"
-  FNAME=$REALFNAME
-
-  #FILENAME_TRASH="${PWD}"
-  #POS=$(expr match "$REALFNAME" "'"${FILENAME_TRASH}"'")
-  #echo "pos: $POS"
-  #FNAME=".${REALFNAME:$POS}"
-  #echo "FNAME: ${FNAME}"
-
+  LINT_RESULT=$(java -jar ${RHINO} -f ${JSLINT} ${RHINO_JSLINT} ${TEMP_FILE})
 
   if [ "$VERBOSE" -eq 0 ]
   then
-      concise_output "${FNAME}" "${LINT_RESULT}"
+      concise_output "${REAL_FILE}" "${LINT_RESULT}"
   else
-      verbose_output "${FNAME}" "${LINT_RESULT}"
+      verbose_output "${REAL_FILE}" "${LINT_RESULT}"
   fi
 }
 
 TEMPFILE=$(${MKTEMP} /tmp/jslint.XXXXXXXXXX) && {
   echo "/*jslint ${OPTIONS} */" > "${TEMPFILE}"
-  /bin/cat "${FILE_NAME}" >> "${TEMPFILE}"
-  #echo "java -jar ${RHINO} -f ${JSLINT} ${JSLINTR} ${TEMPFILE}"
-  #OUT=$(java -jar ${RHINO} -f ${JSLINT} ${JSLINTR} ${TEMPFILE})
-  #echo "${OUT}"
+  ${CAT} "${FILE_NAME}" >> "${TEMPFILE}"
+  #echo "debug:: runjslint $TEMPFILE $FILENAME"
   runjslint "${TEMPFILE}" "${FILE_NAME}"
-  #/bin/rm -f "${TEMPFILE}"
+  ${RM} -f "${TEMPFILE}"
 }
