@@ -2,6 +2,7 @@
 
 FILE_NAME=${1}
 VERBOSE_MODE=${2}
+OPTIONS=${3}
 VERBOSE=${VERBOSE_MODE:-1}
 
 MKTEMP=mktemp
@@ -9,11 +10,9 @@ SED=sed
 CAT=cat
 RM=rm
 
-RHINO="$JSLINTR_ROOT/rhino/js.jar"
-JSLINT="$JSLINTR_ROOT/jslint/jslint.js"
-RHINO_JSLINT="$JSLINTR_ROOT/rhino_jslint.js"
-
-OPTIONS='sloppy:true, white:false, nomen:true, debug:false, plusplus:true, eqeqeq:true, bitwise:true, onevar:true'
+RHINO="$JSLINTR_LIB/rhino/js.jar"
+JSLINT="$JSLINTR_LIB/jslint/jslint.js"
+RHINO_JSLINT="$JSLINTR_LIB/rhino_jslint.js"
 
 GREEN="\e[0;32m"
 RED="\e[0;31m"
@@ -44,7 +43,7 @@ function verbose_output () {
       RESULT="${GREEN}OK${NC}\n"
   fi
 
-  printf "$(ls ${FILENAME}): ${RESULT}"
+  echo "     - $(ls ${FILENAME}): ${RESULT}"
 }
 
 function concise_output () {
@@ -59,7 +58,7 @@ function concise_output () {
       RESULT="${GREEN}.${NC}"
   fi
 
-  printf "${RESULT}"
+  echo "${RESULT}"
 }
 
 function runjslint () {
@@ -71,16 +70,17 @@ function runjslint () {
 
   if [ "$VERBOSE" -eq 0 ]
   then
-      concise_output "${REAL_FILE}" "${LINT_RESULT}"
+      LINTR_RESULT=$(concise_output "${REAL_FILE}" "${LINT_RESULT}")
   else
-      verbose_output "${REAL_FILE}" "${LINT_RESULT}"
+      LINTR_RESULT=$(verbose_output "${REAL_FILE}" "${LINT_RESULT}")
   fi
+
+  printf "$LINTR_RESULT"
 }
 
 TEMPFILE=$(${MKTEMP} /tmp/jslint.XXXXXXXXXX) && {
   echo "/*jslint ${OPTIONS} */" > "${TEMPFILE}"
   ${CAT} "${FILE_NAME}" >> "${TEMPFILE}"
-  #echo "debug:: runjslint $TEMPFILE $FILENAME"
   runjslint "${TEMPFILE}" "${FILE_NAME}"
   ${RM} -f "${TEMPFILE}"
 }

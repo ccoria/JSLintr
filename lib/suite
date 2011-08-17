@@ -1,59 +1,60 @@
 #!/usr/bin/env bash
 
 ###
-# Setting up bins
+# Setting up vars
 #
+# JSLINTR_ROOT=/opt/local/lib/jslint/
+# OPTIONS_FILE=/opt/local/etc/options.sample
+#
+export JSLINTR_ROOT=${JSLINTR_ROOT:-$(pwd -P)}
+export JSLINTR_LIB="$JSLINTR_ROOT/lib/"
+OPTIONS_SAMPLE_FILE="${JSLINTR_ROOT}/etc/options.sample"
+
 FIND=find
 EGREP=egrep
 PWD=pwd
 CHMOD=chmod
 
-#export JSLINTR_ROOT="/usr/lib/jslintr/"
-THIS_FILE=$(ls -l $0 | awk '{print $11}')
-export JSLINTR_ROOT=$(dirname $THIS_FILE)
-CORE="$JSLINTR_ROOT/core"
-
 ###
-# Main function
+# Adding start_jslintr function
 #
-function start_jslintr () {
-	DIR=${1}
-	SRCROOT=${DIR:-LOCALDIR}
-		
-    echo -e "\n====+> Starting JSLint. \n\n    \"WARNING! JSLint will hurt your feelings.\" - Douglas Crockford \n"
-
-    counter=0
-    for JS_FILE in $( ${FIND} ${SRCROOT} -type f -name '*.js' | ${EGREP} -v '\.svn' );
-    do
-		#echo "debug:: ${CORE} "${JS_FILE}" ${VERBOSE_MODE}"
-        counter=$(($counter+1));
-		JS_FILE="$(echo $JS_FILE | sed 's/\/\//\//g')" # substituting // in /js	
-  	    ${CORE} "${JS_FILE}" ${VERBOSE_MODE};
-    done
-
-    echo -e "\n\n===+> JSLintr Complete: ${counter} tests done! \n"
-}
-
+source "$JSLINTR_LIB/start_jslintr"
 	
 ###
-# Verifying optionals
+# Verifying optional parameters
 #
+case "$1" in 
+	"-v" | "--verbose")		shift
+							VERBOSE=1
+							;;
+	*)						VERBOSE=0
+							;;
+esac
 
-if [ "$1" == "-v" ]; then
-	shift # shifting parameters index
-	export VERBOSE_MODE=1
-else
-	export VERBOSE_MODE=0
-fi
+###
+# Verifying usage and calling jslintr =)
+#		
+TARGET=$1
+OPTIONS_FILE=$2
+OPTIONS_FILE=${OPTIONS_FILE:-$OPTIONS_SAMPLE_FILE}
+OPTIONS=""
+TARGET_TYPE="file"
+#GOOD_PARTS='sloppy:false,white:false,nomen:true,debug:false,plusplus:true,eqeqeq:true,bitwise:true,onevar:true'
 
-if [ "$1" == "" ]; then
-	echo "usage: jslintr [-v] /directory/name/ "
+if [ "$TARGET" == "" ]; then
+	echo "usage: jslintr [-v] target_path "
 else
-	TYPE=$(file -b $1)
-	if [ $TYPE == "directory" ]; then
-		DIR="$(echo $1 | sed 's/\/\//\//g')" # substituting // in /
+	FILE=$(file -b $TARGET)
+	if [ "$FILE" == "directory" ]; then
+		# removing a possible final bar
+		TARGET="$(echo $TARGET | sed 's/\/$//g')"
+		TARGET_TYPE="directory"		
 	fi
-		
-	#echo "debug:: start_jslintr $DIR"
-	start_jslintr "$DIR"
+	
+	if [ -r "$OPTIONS_FILE" ]; then
+		OPTIONS=$(cat $OPTIONS_FILE | xargs echo | sed 's/ //g')
+	fi
+	
+	#echo "debug: start_jslintr $TARGET $TARGET_TYPE $VERBOSE $OPTIONS"
+	start_jslintr "$TARGET" "$TARGET_TYPE" "$VERBOSE" "$OPTIONS"
 fi
