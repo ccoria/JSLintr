@@ -1,0 +1,8 @@
+sloppy:false,
+white:false,
+nomen:true,
+debug:false,
+plusplus:true,
+eqeqeq:true,
+bitwise:true,
+onevar:true

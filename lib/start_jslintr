@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+CORE="$JSLINTR_LIB/core"
+
+###
+# Main function
+#
+
+function start_jslintr () {
+	local TARGET=${1}
+	local TYPE=${2}
+	local VERBOSE=${3}
+	local OPTIONS=${4}
+	local counter=-1
+		
+    echo -e "\n====+> Starting JSLint. \n\n    \"WARNING! JSLint will hurt your feelings.\" - Douglas Crockford \n"
+
+	if [ "$TYPE" == "file" ]; then
+		${CORE} "${TARGET}" ${VERBOSE} "${OPTIONS}" ;
+	else
+    	counter=0
+	    for JS_FILE in $( ${FIND} ${TARGET} -type f -name '*.js' | ${EGREP} -v '\.svn' );
+	    do
+	        counter=$(($counter+1));
+			
+			# jslinting file
+			${CORE} "${JS_FILE}" "${VERBOSE}" "${OPTIONS}" ;
+	    done
+	fi
+
+    if [ $counter -gt 0 ];then
+    	echo -e "\n\n===+> JSLintr Complete: ${counter} tests done! \n"
+	else
+		echo -e "\n===+> JSLintr Done! \n"
+	fi
+}
