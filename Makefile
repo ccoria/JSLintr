@@ -6,13 +6,11 @@ export JSLINTR_TMP="/tmp/jslintr"
 
 .PHONY: build
 build:
-	@echo "Building to $(JSLINTR_BIN)"
 	@helpers/builder.sh $(JSLINTR_BIN)
-	@echo "Build OK"
 	
 .PHONY: tests
 tests: JSLINTR_BIN=$(JSLINTR_TMP)
 tests: build
 tests:
-	@echo "\n\n- Starting Tests\n"
+	@echo "\n- Starting Tests\n"
 	@tests/test

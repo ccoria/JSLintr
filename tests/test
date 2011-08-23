@@ -21,9 +21,10 @@ function find_in_lint_output () {
 	fi
 }
 
+export USAGE_MESSAGE="usage: jslintr [-v|--verbose] target_path"
 test_jslintr_usage () {
 
-	local RESULT=$(find_in_lint_output "usage")
+	local RESULT=$(find_in_lint_output "usage: jslintr")
 	assertTrue "'JSLintr should show usage when called without parameters" "[ $RESULT == 'ok' ]"
 }
 
