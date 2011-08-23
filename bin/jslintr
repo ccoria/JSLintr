@@ -1,1 +1,180 @@
-../lib/suite
+
+###
+# Setting up vars
+#
+# JSLINTR_ROOT=/opt/local/lib/jslint/
+# OPTIONS_FILE=/opt/local/etc/options.sample
+#
+export JSLINTR_ROOT=${JSLINTR_ROOT:-$(pwd -P)}
+export JSLINTR_LIB="$JSLINTR_ROOT/src/"
+export OPTIONS_SAMPLE_FILE="${JSLINTR_ROOT}/etc/options.sample"
+
+export RHINO="$JSLINTR_LIB/rhino/js.jar"
+export JSLINT="$JSLINTR_LIB/jslint/jslint.js"
+export RHINO_JSLINT="$JSLINTR_LIB/rhino_jslint.js"
+
+export GREEN="\e[0;32m"
+export RED="\e[0;31m"
+export NC="\e[0m"
+
+export FIND=find
+export EGREP=egrep
+export PWD=pwd
+export CHMOD=chmod
+export MKTEMP=mktemp
+export SED=sed
+export CAT=cat
+export RM=rm
+export PRINTF=printf
+function has_jslint_errors () {
+  LINTRESULTS="${1}"
+
+  JSLINT_INDEX=$(expr "$LINTRESULTS" : "OK")
+
+  if [ "$JSLINT_INDEX" -eq 0 ]
+  then 
+      return 0
+  else
+      return 1
+  fi 
+}
+
+function verbose_output () {
+  # naming parameters
+  FILENAME="${1}"
+  LINTRESULTS="${2}"
+
+  if has_jslint_errors "$LINTRESULTS"
+  then
+      RESULT="${RED}FAIL${NC} - $LINTRESULTS\n\n"
+  else
+      RESULT="${GREEN}OK${NC}\n"
+  fi
+
+  printf "     - $(ls ${FILENAME}): ${RESULT}"
+}
+
+function concise_output () {
+  # naming parameters
+  FILENAME="${1}"
+  LINTRESULTS="${2}"
+
+  if has_jslint_errors "$LINTRESULTS"
+  then
+      RESULT="${RED}FAIL${NC} at ${FILENAME} - $LINTRESULTS\n\n"
+  else
+      RESULT="${GREEN}.${NC}"
+  fi
+
+  printf "${RESULT}"
+}
+
+function runjslint () {
+  # naming parameters
+  local TEMP_FILE="${1}"
+  local REAL_FILE="${2}"
+  local VERBOSE_MODE=${3}
+  local VERBOSE=${VERBOSE_MODE:-1}
+
+
+  local LINT_RESULT=$(java -jar ${RHINO} -f ${JSLINT} ${RHINO_JSLINT} ${TEMP_FILE})
+
+  if [ "$VERBOSE" -eq 0 ]
+  then
+      concise_output "${REAL_FILE}" "${LINT_RESULT}"
+  else
+      verbose_output "${REAL_FILE}" "${LINT_RESULT}"
+  fi
+}
+
+function jslintr () {
+	local FILE_NAME=${1}
+	local VERBOSE_MODE=${2}
+	local OPTIONS=${3}	
+	
+	TEMPFILE=$(${MKTEMP} /tmp/jslint.XXXXXXXXXX) && {
+  		echo "/*jslint ${OPTIONS} */" > "${TEMPFILE}"
+  		${CAT} "${FILE_NAME}" >> "${TEMPFILE}"
+  		runjslint "${TEMPFILE}" "${FILE_NAME}" "$VERBOSE_MODE"
+  		${RM} -f "${TEMPFILE}"
+	}
+}
+#!/usr/bin/env sh
+
+###
+# Main function
+#
+function call_jslintr () {
+	local TARGET=${1}
+	local TYPE=${2}
+	local VERBOSE=${3}
+	local OPTIONS=${4}
+	local COUNT=-1
+		
+    ${PRINTF} "\n====+> Starting JSLint. \n\n    \"WARNING! JSLint will hurt your feelings.\" - Douglas Crockford \n\n"
+
+	if [ "$TYPE" == "file" ]; then
+		${CORE} "${TARGET}" ${VERBOSE} "${OPTIONS}" ;
+	else
+    	COUNT=0
+	    for JS_FILE in $( ${FIND} ${TARGET} -type f -name '*.js' | ${EGREP} -v '\.svn' );
+	    do
+	        COUNT=$(($counter+1));
+			
+			# jslinting file
+			jslintr "${JS_FILE}" "${VERBOSE}" "${OPTIONS}"
+	    done
+	fi
+
+    if [ $COUNT -gt 0 ];then
+    	${PRINTF} "\n\n===+> JSLintr Complete: ${counter} tests done! \n"
+	else
+		${PRINTF} "\n===+> JSLintr Done! \n"
+	fi
+}
+###
+# Verifying usage and calling jslintr =)
+#
+function main () {
+	
+	###
+	# Verifying optional parameters
+	#
+	case "$1" in 
+		"-v" | "--verbose")		shift
+								VERBOSE=1
+								;;
+		*)						VERBOSE=0
+								;;
+	esac
+	
+	local TARGET="${1}"
+	local OPTIONS_FILE="${2}"
+	local OPTIONS_FILE=${OPTIONS_FILE:-$OPTIONS_SAMPLE_FILE}
+	local OPTIONS=""
+	local TARGET_TYPE="file"
+
+	if [ "$TARGET" == "" ]; then
+		echo "usage: jslintr [-v] target_path "
+	else
+		FILE=$(file -b $TARGET)
+		if [ "$FILE" == "directory" ]; then
+			# removing a possible final bar
+			TARGET="$(echo $TARGET | sed 's/\/$//g')"
+			TARGET_TYPE="directory"		
+		fi
+	
+		if [ -r "$OPTIONS_FILE" ]; then
+			OPTIONS=$(cat $OPTIONS_FILE | xargs echo | sed 's/ //g')
+		fi
+	
+		#echo "debug: start_jslintr $TARGET $TARGET_TYPE $VERBOSE $OPTIONS"
+		call_jslintr "$TARGET" "$TARGET_TYPE" "$VERBOSE" "$OPTIONS"
+	fi
+}
+
+###
+# Everything starts here
+#
+main "${1}" "${2}"
+
