@@ -1,4 +1,3 @@
-#!/usr/bin/env sh
 
 ###
 # Main function
@@ -10,7 +9,7 @@ function call_jslintr () {
 	local OPTIONS=${4}
 	local COUNT=-1
 		
-    ${PRINTF} "\n====+> Starting JSLint. \n\n    \"WARNING! JSLint will hurt your feelings.\" - Douglas Crockford \n\n"
+    ${PRINTF} "\n====+> Starting JSLintr. \n\n    \"WARNING! JSLint will hurt your feelings.\" - Douglas Crockford \n\n"
 
 	if [ "$TYPE" == "file" ]; then
 		${CORE} "${TARGET}" ${VERBOSE} "${OPTIONS}" ;
@@ -18,7 +17,7 @@ function call_jslintr () {
     	COUNT=0
 	    for JS_FILE in $( ${FIND} ${TARGET} -type f -name '*.js' | ${EGREP} -v '\.svn' );
 	    do
-	        COUNT=$(($counter+1));
+	        COUNT=$(($COUNT+1))
 			
 			# jslinting file
 			jslintr "${JS_FILE}" "${VERBOSE}" "${OPTIONS}"
@@ -26,7 +25,7 @@ function call_jslintr () {
 	fi
 
     if [ $COUNT -gt 0 ];then
-    	${PRINTF} "\n\n===+> JSLintr Complete: ${counter} tests done! \n"
+    	${PRINTF} "\n\n===+> JSLintr Complete: ${COUNT} tests done! \n"
 	else
 		${PRINTF} "\n===+> JSLintr Done! \n"
 	fi

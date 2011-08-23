@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+export JSLINTR_ROOT=${JSLINTR_ROOT:-$(pwd -P)}
+export JSLINTR_SRC="$JSLINTR_ROOT/src/"
+export FIXTURES=${JSLINTR_ROOT}/tests/fixtures
+export JSLINTR="/tmp/jslintr"
+
+function find_in_lint_output () {
+	local STRING=${1}
+	local PARAMS=${2}
+	
+	local OUT=$($JSLINTR $PARAMS)
+	
+	
+	local RES=$(echo $OUT | grep -q "$STRING" && echo "ok")
+	
+	if [ "$RES" == "ok" ];then
+		echo $RES
+	else
+		echo $OUT
+	fi
+}
+
+test_jslintr_usage () {
+
+	local RESULT=$(find_in_lint_output "usage")
+	assertTrue "'JSLintr should show usage when called without parameters" "[ $RESULT == 'ok' ]"
+}
+
+test_jslintr_usage_with_verbose () {
+
+	local RESULT=$(find_in_lint_output "usage" "-v")
+	assertTrue "'JSLintr should show usage when called without parameters" "[ $RESULT == 'ok' ]"
+}
+
+test_jslintr_should_count_tests () {
+
+	local RESULT=$(find_in_lint_output "2 tests done" "$FIXTURES")
+	assertTrue "'JSLintr should print the number of tests done" "[ $RESULT == 'ok' ]"
+}
+
+
+. bin/shunit2
