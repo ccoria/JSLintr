@@ -22,7 +22,7 @@ function main () {
 	local TARGET_TYPE="file"
 
 	if [ "$TARGET" == "" ]; then
-		echo "usage: jslintr [-v|--verbose] target_path "
+		echo "usage: jslintr [-v|--verbose] target_path"
 	else
 		FILE=$(file -b $TARGET)
 		if [ "$FILE" == "directory" ]; then
