@@ -12,7 +12,7 @@ function call_jslintr () {
     ${PRINTF} "\n====+> Starting JSLintr. \n\n    \"WARNING! JSLint will hurt your feelings.\" - Douglas Crockford \n\n"
 
 	if [ "$TYPE" == "file" ]; then
-		${CORE} "${TARGET}" ${VERBOSE} "${OPTIONS}" ;
+		jslintr "${TARGET}" "${VERBOSE}" "${OPTIONS}"
 	else
     	COUNT=0
 	    for JS_FILE in $( ${FIND} ${TARGET} -type f -name '*.js' | ${EGREP} -v '\.svn' );

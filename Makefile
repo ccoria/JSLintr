@@ -12,5 +12,5 @@ build:
 tests: JSLINTR_BIN=$(JSLINTR_TMP)
 tests: build
 tests:
-	@echo "\n- Starting Tests\n"
+	@echo "- Starting Tests\n"
 	@tests/test

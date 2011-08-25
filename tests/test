@@ -5,46 +5,87 @@ export JSLINTR_SRC="$JSLINTR_ROOT/src/"
 export FIXTURES=${JSLINTR_ROOT}/tests/fixtures
 export JSLINTR="/tmp/jslintr"
 
-function find_in_lint_output () {
-	local STRING=${1}
-	local PARAMS=${2}
-	
+function _jslintr () {
+	local PARAMS="$@"
 	local OUT=$($JSLINTR $PARAMS)
 	
+	echo $OUT
+}
+
+function has_pattern_in_string () {
+	local PATTERN=${1}
+	local STRING=${2}
 	
-	local RES=$(echo $OUT | grep -q "$STRING" && echo "ok")
+	local RES=$(echo $STRING | grep -q "$PATTERN" && echo 1)
 	
-	if [ "$RES" == "ok" ];then
-		echo $RES
-	else
-		echo $OUT
-	fi
+	echo $RES
 }
 
 export USAGE_MESSAGE="usage: jslintr \[\-v\|\-\-verbose\] target_path"
-test_jslintr_usage () {
+test_jslintr_should_show_usage_when_called_without_params () {
 
-	local RESULT=$(find_in_lint_output "$USAGE_MESSAGE")
-	assertTrue "'JSLintr should show usage when called without parameters" "[ $RESULT == 'ok' ]"
+	local OUTPUT=$(_jslintr)
+	local RESULT=$(has_pattern_in_string "$USAGE_MESSAGE" "$OUTPUT")
+	assertTrue "'JSLintr should show usage when called without parameters" "[ $RESULT ]"
 }
 
-test_jslintr_usage_with_verbose () {
-
-	local RESULT=$(find_in_lint_output "$USAGE_MESSAGE" "-v")
-	assertTrue "'JSLintr should show usage when called without parameters" "[ $RESULT == 'ok' ]"
+test_jslintr_should_show_usage_when_called_without_target () {
+	
+	local OUTPUT=$(_jslintr -v)
+	local RESULT=$(has_pattern_in_string "$USAGE_MESSAGE" "$OUTPUT")
+	assertTrue "'JSLintr should show usage when called without parameters" "[ $RESULT ]"
+	
+	local OUTPUT=$(_jslintr --verbose)
+	local RESULT=$(has_pattern_in_string "$USAGE_MESSAGE" "$OUTPUT")
+	assertTrue "'JSLintr should show usage when called without parameters" "[ $RESULT ]"
 }
 
-test_jslintr_should_show_start_message () {
+test_jslintr_should_work_with_a_single_file () {
 
-	local RESULT=$(find_in_lint_output "JSLintr " "$FIXTURES")
-	assertTrue "'JSLintr should print the number of tests done" "[ $RESULT == 'ok' ]"
+	local OUTPUT=$(_jslintr "$FIXTURES/js_sample_ok.js")
+	
+	local HAS_STARTING=$(has_pattern_in_string "Starting JSLintr." "$OUTPUT")
+	assertTrue "'JSLintr started ok" "[ $HAS_STARTING ]"
+	
+	local HAS_DONE=$(has_pattern_in_string "JSLintr Done!" "$OUTPUT")
+	assertTrue "'JSLintr closed ok" "[ $HAS_DONE ]"
 }
 
-test_jslintr_should_count_tests () {
+test_jslintr_should_work_with_a_single_file_with_errors () {
 
-	local RESULT=$(find_in_lint_output "2 tests done" "$FIXTURES")
-	assertTrue "'JSLintr should print the number of tests done" "[ $RESULT == 'ok' ]"
+	local OUTPUT=$(_jslintr "$FIXTURES/js_sample_error.js")
+
+	local HAS_STARTING=$(has_pattern_in_string "Starting JSLintr." "$OUTPUT")
+	assertTrue "'JSLintr started ok" "[ $HAS_STARTING ]"
+	
+	local HAS_FAIL=$(has_pattern_in_string "FAIL" "$OUTPUT")
+	assertTrue "'JSLintr should show FAIL message" "[ $HAS_FAIL ]"
+	
+	local HAS_FILENAME=$(has_pattern_in_string "\/js_sample_error\.js" "$OUTPUT")
+	assertTrue "'JSLintr should filename" "[ $HAS_FILENAME ]"
+	
+	local HAS_DONE=$(has_pattern_in_string "JSLintr Done!" "$OUTPUT")
+	assertTrue "'JSLintr closed ok" "[ $HAS_DONE ]"
 }
 
+test_jslintr_should_work_in_directories () {
+
+	local OUTPUT=$(_jslintr "$FIXTURES")
+	
+	local HAS_STARTING=$(has_pattern_in_string "Starting JSLintr." "$OUTPUT")
+	assertTrue "'JSLintr started ok" "[ $HAS_STARTING ]"
+	
+	local HAS_FAIL=$(has_pattern_in_string "FAIL" "$OUTPUT")
+	assertTrue "'JSLintr should show FAIL message," "[ $HAS_FAIL ]"
+	
+	local HAS_FILENAME=$(has_pattern_in_string "tests\/fixtures\/js_sample_error.js" "$OUTPUT")
+	assertTrue "'JSLintr should show error file name" "[ $HAS_FILENAME ]"
+	
+	local HAS_COUNTER=$(has_pattern_in_string "1\ errors\ found" "$OUTPUT")
+	assertTrue "'JSLintr should show FAIL counter message," "[ $HAS_COUNTER ]"
+	
+	local HAS_DONE=$(has_pattern_in_string "JSLintr Complete: 2 tests done!" "$OUTPUT")
+	assertTrue "'JSLintr closed ok" "[ $HAS_DONE ]"
+}
 
 . bin/shunit2
