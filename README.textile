@@ -2,7 +2,6 @@ h1. JSLintr
 
 A jslint command line tool
 
-
 h2. What can it do?
 
  * Run jslint without opening a browser
@@ -10,6 +9,8 @@ h2. What can it do?
  * Use a configuration file to specify the options
  * Choose between verbose and concise output
 
+
+h2. How to
 
 h3. Building
 
