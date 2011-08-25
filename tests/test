@@ -34,6 +34,12 @@ test_jslintr_usage_with_verbose () {
 	assertTrue "'JSLintr should show usage when called without parameters" "[ $RESULT == 'ok' ]"
 }
 
+test_jslintr_should_show_start_message () {
+
+	local RESULT=$(find_in_lint_output "JSLintr " "$FIXTURES")
+	assertTrue "'JSLintr should print the number of tests done" "[ $RESULT == 'ok' ]"
+}
+
 test_jslintr_should_count_tests () {
 
 	local RESULT=$(find_in_lint_output "2 tests done" "$FIXTURES")

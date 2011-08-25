@@ -1,7 +1,7 @@
-export JSLINTR_ROOT=${JSLINTR_ROOT:-$(pwd -P)}
-export JSLINTR_SRC="${JSLINTR_ROOT}/src/"
+export JSLINTR_ROOT=$(shell pwd -P)
+export JSLINTR_SRC=$(JSLINTR_ROOT)/src/
 
-export JSLINTR_BIN="${JSLINTR_ROOT}/bin/jslintr"
+export JSLINTR_BIN=$(JSLINTR_ROOT)/bin/jslintr
 export JSLINTR_TMP="/tmp/jslintr"
 
 .PHONY: build

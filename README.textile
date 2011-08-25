@@ -12,14 +12,14 @@ h2. What can it do?
 
 h2. How to
 
-h3. Building
+h3. Build
 
 <pre>$ make build</pre>
 
-h3. Running
+h3. Run
 
 <pre>$ bin/jslintr</pre>
 
-h3. Running tests
+h3. Run tests
 
 <pre>$ make tests</pre>
