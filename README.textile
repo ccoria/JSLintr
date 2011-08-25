@@ -1,1 +1,24 @@
-h2. JSLintr - A jslint command line tool
+h2. JSLintr
+
+A jslint command line tool
+
+
+h3. What can it do?
+
+ * Run jslint without opening a browser
+ * Pass jslint on a file or run it recursively on a directory
+ * Use a configuration file to specify the options
+ * Choose between verbose and concise output
+
+
+h3. Building
+
+<pre>$ make build</pre>
+
+h3. Running
+
+<pre>$ bin/jslintr</pre>
+
+h3. Running tests
+
+<pre>$ make tests</pre>
