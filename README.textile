@@ -1,9 +1,9 @@
-h2. JSLintr
+h1. JSLintr
 
 A jslint command line tool
 
 
-h3. What can it do?
+h2. What can it do?
 
  * Run jslint without opening a browser
  * Pass jslint on a file or run it recursively on a directory
