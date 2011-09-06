@@ -42,7 +42,7 @@ test_jslintr_should_show_usage_when_called_without_target () {
 
 test_jslintr_should_work_with_a_single_file () {
 
-	local OUTPUT=$(_jslintr "$FIXTURES/js_sample_ok.js")
+	local OUTPUT=$(_jslintr "$FIXTURES/js_sample_ok.js $FIXTURES/jslintoptions")
 	
 	local HAS_STARTING=$(has_pattern_in_string "Starting JSLintr." "$OUTPUT")
 	assertTrue "'JSLintr started ok" "[ $HAS_STARTING ]"
@@ -51,9 +51,43 @@ test_jslintr_should_work_with_a_single_file () {
 	assertTrue "'JSLintr closed ok" "[ $HAS_DONE ]"
 }
 
+test_jslintr_should_work_with_a_single_file_in_verbose_mode () {
+
+	local OUTPUT=$(_jslintr -v "$FIXTURES/js_sample_ok.js $FIXTURES/jslintoptions")
+	
+	local HAS_STARTING=$(has_pattern_in_string "Starting JSLintr." "$OUTPUT")
+	assertTrue "'JSLintr started ok" "[ $HAS_STARTING ]"
+	
+	local HAS_STARTING=$(has_pattern_in_string "tests\/fixtures\/js\_sample\_ok\.js\:" "$OUTPUT")
+	assertTrue "'JSLintr should show success file" "[ $HAS_STARTING ]"
+	
+	local HAS_STARTING=$(has_pattern_in_string "OK" "$OUTPUT")
+	assertTrue "'JSLintr should show OK" "[ $HAS_STARTING ]"
+	
+	local HAS_DONE=$(has_pattern_in_string "JSLintr Done!" "$OUTPUT")
+	assertTrue "'JSLintr closed ok" "[ $HAS_DONE ]"
+}
+
 test_jslintr_should_work_with_a_single_file_with_errors () {
 
-	local OUTPUT=$(_jslintr "$FIXTURES/js_sample_error.js")
+	local OUTPUT=$(_jslintr "$FIXTURES/js_sample_error.js $FIXTURES/jslintoptions")
+
+	local HAS_STARTING=$(has_pattern_in_string "Starting JSLintr." "$OUTPUT")
+	assertTrue "'JSLintr started ok" "[ $HAS_STARTING ]"
+	
+	local HAS_FAIL=$(has_pattern_in_string "FAIL" "$OUTPUT")
+	assertTrue "'JSLintr should show FAIL message" "[ $HAS_FAIL ]"
+	
+	local HAS_FILENAME=$(has_pattern_in_string "\/js_sample_error\.js" "$OUTPUT")
+	assertTrue "'JSLintr should filename" "[ $HAS_FILENAME ]"
+	
+	local HAS_DONE=$(has_pattern_in_string "JSLintr Done!" "$OUTPUT")
+	assertTrue "'JSLintr closed ok" "[ $HAS_DONE ]"
+}
+
+test_jslintr_should_work_with_a_single_file_with_errors_in_verbose_mode () {
+
+	local OUTPUT=$(_jslintr --verbose "$FIXTURES/js_sample_error.js $FIXTURES/jslintoptions")
 
 	local HAS_STARTING=$(has_pattern_in_string "Starting JSLintr." "$OUTPUT")
 	assertTrue "'JSLintr started ok" "[ $HAS_STARTING ]"
@@ -70,7 +104,10 @@ test_jslintr_should_work_with_a_single_file_with_errors () {
 
 test_jslintr_should_work_in_directories () {
 
-	local OUTPUT=$(_jslintr "$FIXTURES")
+	local OUTPUT=$(_jslintr "$FIXTURES $FIXTURES/jslintoptions")
+    # echo "=========="
+    # echo $OUTPUT
+    # echo "=========="
 	
 	local HAS_STARTING=$(has_pattern_in_string "Starting JSLintr." "$OUTPUT")
 	assertTrue "'JSLintr started ok" "[ $HAS_STARTING ]"

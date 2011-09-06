@@ -7,7 +7,7 @@ export JSLINTR_TMP="/tmp/jslintr"
 .PHONY: build
 build:
 	@helpers/builder.sh $(JSLINTR_BIN)
-	
+
 .PHONY: tests
 tests: JSLINTR_BIN=$(JSLINTR_TMP)
 tests: build

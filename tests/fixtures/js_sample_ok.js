@@ -1,2 +1,2 @@
 
-var test = 1;
+var test_js = 1;

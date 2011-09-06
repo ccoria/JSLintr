@@ -27,6 +27,6 @@ function call_jslintr () {
     if [ $COUNT -gt 0 ];then
     	${PRINTF} "\n\n===+> JSLintr Complete: ${COUNT} tests done! \n"
 	else
-		${PRINTF} "\n===+> JSLintr Done! \n"
+		${PRINTF} "\n\n===+> JSLintr Done! \n"
 	fi
 }

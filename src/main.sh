@@ -16,8 +16,8 @@ function main () {
 	esac
 	
 	local TARGET="${1}"
-	local OPTIONS_FILE="${2}"
-	local OPTIONS_FILE=${OPTIONS_FILE:-$OPTIONS_SAMPLE_FILE}
+	local PARAM_OPT_FILE="${2}"
+	local OPTIONS_FILE=${PARAM_OPT_FILE:-$SAMPLE_OPTIONS_FILE}
 	local OPTIONS=""
 	local TARGET_TYPE="file"
 
@@ -30,9 +30,13 @@ function main () {
 			TARGET="$(echo $TARGET | sed 's/\/$//g')"
 			TARGET_TYPE="directory"		
 		fi
-	
-		if [ -r "$OPTIONS_FILE" ]; then
-			OPTIONS=$(cat $OPTIONS_FILE | xargs echo | sed 's/ //g')
+	    
+	    #echo "OPTIONS: $OPTIONS_FILE"
+		if [ -f "$OPTIONS_FILE" ]; then
+			OPTIONS=$(cat $OPTIONS_FILE | sed 's/\/\/.*$//g' | xargs echo | sed 's/ //g');
+			#echo "OPTIONS: $OPTIONS"
+		else
+		    echo "No options file loaded!"
 		fi
 	
 		#echo "debug: start_jslintr $TARGET $TARGET_TYPE $VERBOSE $OPTIONS"
@@ -43,5 +47,5 @@ function main () {
 ###
 # Everything starts here
 #
-main "${1}" "${2}"
+main "${1}" "${2}" "${3}"
 

@@ -49,7 +49,6 @@ function runjslint () {
   local VERBOSE_MODE=${3}
   local VERBOSE=${VERBOSE_MODE:-1}
 
-
   local LINT_RESULT=$(java -jar ${RHINO} -f ${JSLINT} ${RHINO_JSLINT} ${TEMP_FILE})
 
   if [ "$VERBOSE" -eq 0 ]
@@ -66,9 +65,9 @@ function jslintr () {
 	local OPTIONS=${3}	
 	
 	TEMPFILE=$(${MKTEMP} /tmp/jslint.XXXXXXXXXX) && {
-  		echo "/*jslint ${OPTIONS} */" > "${TEMPFILE}"
+  		echo "/* jslint ${OPTIONS} */" > "${TEMPFILE}"
   		${CAT} "${FILE_NAME}" >> "${TEMPFILE}"
   		runjslint "${TEMPFILE}" "${FILE_NAME}" "$VERBOSE_MODE"
-  		${RM} -f "${TEMPFILE}"
+  		#${RM} -f "${TEMPFILE}"
 	}
 }

@@ -1,8 +1,45 @@
-sloppy:false,
-white:false,
-nomen:true,
-debug:false,
-plusplus:true,
-eqeqeq:true,
-bitwise:true,
-onevar:true
+// This is the config file that helps you to choose which JSlint feature you want to use.
+// For more information about this options, please visit:
+// http://www.jslint.com/lint.html
+
+// TODO:
+// predef:true // n array of strings, the names of predefined global variables, 
+// or an object whose keys are global variable names, and whose values are booleans 
+// that determine if each variable is assignable (also see global). predef is used 
+// with the option object, but not with the / jslint / comment. You can also use the var statement to declare global variables in a script file.
+
+adsafe: false, // true if ADsafe rules should be enforced. See http://www.ADsafe.org/.
+bitwise: true, // true if bitwise operators should be allowed. (more)
+browser: true, // true if the standard browser globals should be predefined. (more)
+cap: true, // true if uppercase HTML should be allowed.
+confusion: true, // true if variables and properties are allowed to contain more than one type of value.
+continue: true, // true if the continue statement should be allowed.
+css: true, // true if CSS workarounds should be tolerated
+debug: true, //true if debugger statements should be allowed. Set this option to false before going into production.
+devel: true, //tru if browser globals that are useful in development should be predefined. (Assume console, alert,...)
+eqeq: true, //true if the == and != operators should be tolerated. (more).
+es5: true, //true if ES5 syntax should be allowed. It is likely that programs using this option will produce syntax errors on ES3 systems.
+evil: true, //true if eval should be allowed. (more)
+forin: true, //true if unfiltered for in statements should be allowed. (more)
+fragment: true, // true if HTML fragments should be allowed. (more)
+indent: 4, // The number of spaces used for indentation (default is 4).
+maxerr: 50, // The maximum number of warnings reported. (default is 50)
+maxlen: 100, // The maximum number of characters in a line.
+newcap: true, // true if Initial Caps with constructor functions is optional. (more)
+node: true, // true if Node.js globals should be predefined. (more)
+nomen: true, // true if names should not be checked for initial or trailing underbars. (Tolerate dangling _ in identifiers)
+on: true, // true if HTML event handlers should be allowed. (more)
+passfail: false, // true if the scan should stop on first error.
+plusplus: true, // true if ++ and -- should be allowed. (more)
+regexp: true, // true if . and [^...] should be allowed in RegExp literals. They match more material than might be expected, allowing attackers to confuse applications. These forms should not be used when validating in secure applications.
+rhino: true, // true  if the Rhino environment globals should be predefined. (more)
+safe: true, // true if the safe subset rules are enforced. These rules are used by ADsafe. It enforces the safe subset rules but not the widget structure rules.
+sloppy: true, // true if the ES5 'use strict'; pragma is not required. Do not use this pragma unless you know what you are doing.
+sub: true, // true if subscript notation may be used for expressions better expressed in dot notation.
+undef: true, // true if variables and functions need not be declared before used. (more)
+unparam: true, // true if warnings should not be given for unused parameters.
+vars: true, // true if multiple var statement per function should be allowed. (more)
+white: true, // true if strict whitespace rules should be ignored.
+widget: true, // true if the Yahoo Widgets globals should be predefined. (more)
+windows: true // true if the Windows globals should be predefined. (more)
+

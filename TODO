@@ -1,3 +1,6 @@
 - improve configfile usage
 - help
 - fail fast option
+- create pkgs
+- verify license
+- make it work with urls

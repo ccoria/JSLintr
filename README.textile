@@ -10,7 +10,7 @@ h2. What can it do?
  * Choose between verbose and concise output
 
 
-h2. How to
+h2. How to...
 
 h3. Build
 
