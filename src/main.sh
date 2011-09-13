@@ -17,7 +17,7 @@ function main () {
 	
 	local TARGET="${1}"
 	local PARAM_OPT_FILE="${2}"
-	local OPTIONS_FILE=${PARAM_OPT_FILE:-$SAMPLE_OPTIONS_FILE}
+	local OPTIONS_FILE=${PARAM_OPT_FILE:-$BIN_OPTIONS_FILE}
 	local OPTIONS=""
 	local TARGET_TYPE="file"
 

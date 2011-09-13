@@ -131,4 +131,4 @@ test_jslintr_should_work_in_directories () {
 	assertTrue "'JSLintr closed ok" "[ $HAS_DONE ]"
 }
 
-. bin/shunit2
+. tests/bin/shunit2

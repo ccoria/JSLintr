@@ -2,13 +2,6 @@
 ###
 # Setting up vars
 #
-# JSLINTR_ROOT=/opt/local/lib/jslint/
-# OPTIONS_FILE=/opt/local/etc/options.sample
-#
-export JSLINTR_ROOT=${JSLINTR_ROOT:-$(pwd -P)}
-export JSLINTR_LIB="$JSLINTR_ROOT/libs/"
-export SAMPLE_OPTIONS_FILE="${JSLINTR_ROOT}/etc/options.sample"
-#export OPTIONS_FILE="./jslint_options"
 
 export RHINO="$JSLINTR_LIB/js.jar"
 export JSLINT="$JSLINTR_LIB/jslint.js"
