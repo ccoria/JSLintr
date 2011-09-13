@@ -3,7 +3,7 @@
 export JSLINTR_ROOT=${JSLINTR_ROOT:-$(pwd -P)}
 export JSLINTR_SRC="$JSLINTR_ROOT/src/"
 export FIXTURES=${JSLINTR_ROOT}/tests/fixtures
-export JSLINTR="/tmp/jslintr"
+export JSLINTR="/tmp/_jslintr/jslintr"
 
 function _jslintr () {
 	local PARAMS="$@"

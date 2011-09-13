@@ -65,7 +65,7 @@ function jslintr () {
 	local OPTIONS=${3}	
 	
 	TEMPFILE=$(${MKTEMP} /tmp/jslint.XXXXXXXXXX) && {
-  		echo "/*jslint ${OPTIONS} */" > "${TEMPFILE}"
+  		echo "/* jslint ${OPTIONS} */" > "${TEMPFILE}"
   		${CAT} "${FILE_NAME}" >> "${TEMPFILE}"
   		runjslint "${TEMPFILE}" "${FILE_NAME}" "$VERBOSE_MODE"
   		${RM} -f "${TEMPFILE}"
