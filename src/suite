@@ -1,9 +1,0 @@
-#!/usr/bin/env sh
-
-export JSLINTR_ROOT=${JSLINTR_ROOT:-$(pwd -P)}
-export JSLINTR_SRC="$JSLINTR_ROOT/src/"	
-
-source "$JSLINTR_SRC/exports.sh"
-source "$JSLINTR_SRC/core.sh"
-source "$JSLINTR_SRC/call_jslintr.sh"
-source "$JSLINTR_SRC/main.sh"

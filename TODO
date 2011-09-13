@@ -4,3 +4,4 @@
 - create pkgs
 - verify license
 - make it work with urls
+- fix permissions on build

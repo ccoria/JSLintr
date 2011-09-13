@@ -24,7 +24,8 @@ if (lint_was_ok) {
 	    
 	    // To handle when jslint stops scan a file (too many errors)
 	    if (errors[i] !== null) {
-            print("\t" + errors[i].reason);
+	        var line = parseInt(errors[i].line, 10) - 1;
+            print("\t" + line + ":" + errors[i].reason);
         }
 	}
 }

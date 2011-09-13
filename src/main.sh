@@ -34,7 +34,7 @@ function main () {
 	    #echo "OPTIONS: $OPTIONS_FILE"
 		if [ -f "$OPTIONS_FILE" ]; then
 			OPTIONS=$(cat $OPTIONS_FILE | sed 's/\/\/.*$//g' | xargs echo | sed 's/ //g');
-			#echo "OPTIONS: $OPTIONS"
+			#printf "OPTIONS: $OPTIONS"
 		else
 		    echo "No options file loaded!"
 		fi
