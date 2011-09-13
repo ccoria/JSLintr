@@ -68,6 +68,6 @@ function jslintr () {
   		echo "/*jslint ${OPTIONS} */" > "${TEMPFILE}"
   		${CAT} "${FILE_NAME}" >> "${TEMPFILE}"
   		runjslint "${TEMPFILE}" "${FILE_NAME}" "$VERBOSE_MODE"
-  		#${RM} -f "${TEMPFILE}"
+  		${RM} -f "${TEMPFILE}"
 	}
 }

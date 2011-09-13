@@ -14,3 +14,4 @@ tests: build
 tests:
 	@echo "- Starting Tests\n"
 	@tests/test
+	@rm $(JSLINTR_TMP)
