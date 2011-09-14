@@ -1,28 +1,33 @@
 
-JSLINTR_BIN=$1
+BUILDER_TARGET=$1
 JSLINTR_LIBS=$2
 JSLINTR_OPTIONS_FILE=$3
 
-JSLINTR_BIN_DIR=$(dirname $JSLINTR_BIN)
+JSLINTR_BIN=$BUILDER_TARGET/jslintr
 
-LIB_FILES_TARGET=$JSLINTR_BIN_DIR/lib/
-OPTIONS_FILE_TARGET=$JSLINTR_BIN_DIR/options
+LIB_FILES_TARGET=$BUILDER_TARGET/lib/
+OPTIONS_FILE_TARGET=$BUILDER_TARGET/options
 
-function remove_old () {
-	# verifying if directory exists and if has files
-	if [ -s $JSLINTR_BIN_DIR ]; then
-		rm -f $JSLINTR_BIN_DIR/*
+function bootstrap () {
+	#echo " . verifying if directory exists and if has files"
+	if [ -s $BUILDER_TARGET ]; then
+		#echo " . removing all files of target directory: $BUILDER_TARGET"
+		rm -rf $BUILDER_TARGET/*
 	else
 		echo "no files"
 	fi
+	
+	mkdir $LIB_FILES_TARGET
 }
 
 function build_new () {
+	#echo " . assembling new jslintr"
+	
 	touch $JSLINTR_BIN
 	chmod u+w $JSLINTR_BIN
 	
 	#exports
-	echo "export JSLINTR_ROOT=$JSLINTR_BIN_DIR/" > $JSLINTR_BIN
+	echo "export JSLINTR_ROOT=$BUILDER_TARGET/" > $JSLINTR_BIN
 	echo "export JSLINTR_LIB=$LIB_FILES_TARGET" >> $JSLINTR_BIN
 	echo "export BIN_OPTIONS_FILE=$OPTIONS_FILE_TARGET" >> $JSLINTR_BIN
 	
@@ -37,15 +42,23 @@ function build_new () {
 
 function copy_required_files () {
 	
-	# copying all lib files to bin dir
+	#echo "copying all lib files ($JSLINTR_LIBS) to bin/libs dir: $LIB_FILES_TARGET"
 	cp -R $JSLINTR_LIBS $LIB_FILES_TARGET
 	
-	# copying the config file to bin dir
+	#echo "copying the config file ($JSLINTR_OPTIONS_FILE) to bin dir ($OPTIONS_FILE_TARGET)"
 	cp $JSLINTR_OPTIONS_FILE $OPTIONS_FILE_TARGET
 }
 
-echo "\n- Building to $JSLINTR_BIN" && \
-remove_old && \
-copy_required_files && \
-build_new && \
-echo "- Build OK"
+if [ -z $1 ];then
+	echo "You should define a valid target"
+elif [ -z $2 ];then
+	echo "You should define a valid libs source dir"
+elif [ -z $3 ];then
+	echo "You should define a valid options source file"
+else
+	echo "\n- Building to $JSLINTR_BIN" && \
+	bootstrap && \
+	copy_required_files && \
+	build_new && \
+	echo "- Build OK"
+fi

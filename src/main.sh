@@ -23,6 +23,8 @@ function main () {
 
 	if [ "$TARGET" == "" ]; then
 		echo "usage: jslintr [-v|--verbose] target_path"
+	elif [ ! -s "$TARGET" ]; then
+		echo "JSLintr: Target not found or empty"
 	else
 		FILE=$(file -b $TARGET)
 		if [ "$FILE" == "directory" ]; then
