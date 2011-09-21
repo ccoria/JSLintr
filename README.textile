@@ -1,6 +1,6 @@
 h1. JSLintr
 
-!A command line tool that runs the "JSLint":http://www.jslint.com from the shell using "Google V8":http://code.google.com/apis/v8/intro.html javascript engine.
+A command line tool that runs the "JSLint":http://www.jslint.com from the shell using "Google V8":http://code.google.com/apis/v8/intro.html javascript engine.
 
 
 h2. What can it do?
