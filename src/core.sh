@@ -1,73 +1,73 @@
 
 function has_jslint_errors () {
-  LINTRESULTS="${1}"
+    LINTRESULTS="${1}"
 
-  JSLINT_INDEX=$(expr "$LINTRESULTS" : "OK")
+    JSLINT_INDEX=$(expr "$LINTRESULTS" : "OK")
 
-  if [ "$JSLINT_INDEX" -eq 0 ]
-  then 
+    if [ "$JSLINT_INDEX" -eq 0 ]
+    then 
       return 0
-  else
+    else
       return 1
-  fi 
+    fi 
 }
 
 function verbose_output () {
-  # naming parameters
-  FILENAME="${1}"
-  LINTRESULTS="${2}"
+    # naming parameters
+    FILENAME="${1}"
+    LINTRESULTS="${2}"
 
-  if has_jslint_errors "$LINTRESULTS"
-  then
+    if has_jslint_errors "$LINTRESULTS"
+    then
       RESULT="${RED}FAIL${NC} - $LINTRESULTS\n\n"
-  else
+    else
       RESULT="${GREEN}OK${NC}\n"
-  fi
+    fi
 
-  printf "     - $(ls ${FILENAME}): ${RESULT}"
+    printf "     - $(ls ${FILENAME}): ${RESULT}"
 }
 
 function concise_output () {
-  # naming parameters
-  FILENAME="${1}"
-  LINTRESULTS="${2}"
+    # naming parameters
+    FILENAME="${1}"
+    LINTRESULTS="${2}"
 
-  if has_jslint_errors "$LINTRESULTS"
-  then
+    if has_jslint_errors "$LINTRESULTS"
+    then
       RESULT="${RED}FAIL${NC} at ${FILENAME} - $LINTRESULTS\n\n"
-  else
+    else
       RESULT="${GREEN}.${NC}"
-  fi
+    fi
 
-  printf "${RESULT}"
+    printf "${RESULT}"
 }
 
 function runjslint () {
-  # naming parameters
-  local TEMP_FILE="${1}"
-  local REAL_FILE="${2}"
-  local VERBOSE_MODE=${3}
-  local VERBOSE=${VERBOSE_MODE:-1}
+    # naming parameters
+    local TEMP_FILE="${1}"
+    local REAL_FILE="${2}"
+    local VERBOSE_MODE=${3}
+    local VERBOSE=${VERBOSE_MODE:-1}
 
-  local LINT_RESULT=$(java -jar ${RHINO} -f ${JSLINT} ${RHINO_JSLINT} ${TEMP_FILE})
+    #local LINT_RESULT=$(java -jar ${RHINO} -f ${JSLINT} ${RHINO_JSLINT} ${TEMP_FILE})
+    local LINT_RESULT=$(libs/d8 libs/jslint.js libs/v8_jslint.js -- ${TEMP_FILE})
 
-  if [ "$VERBOSE" -eq 0 ]
-  then
+    if [ "$VERBOSE" -eq 0 ]; then
       concise_output "${REAL_FILE}" "${LINT_RESULT}"
-  else
+    else
       verbose_output "${REAL_FILE}" "${LINT_RESULT}"
-  fi
+    fi
 }
 
 function jslintr () {
-	local FILE_NAME=${1}
-	local VERBOSE_MODE=${2}
-	local OPTIONS=${3}	
-	
-	TEMPFILE=$(${MKTEMP} /tmp/jslint.XXXXXXXXXX) && {
-  		echo "/* jslint ${OPTIONS} */" > "${TEMPFILE}"
-  		${CAT} "${FILE_NAME}" >> "${TEMPFILE}"
-  		runjslint "${TEMPFILE}" "${FILE_NAME}" "$VERBOSE_MODE"
-  		${RM} -f "${TEMPFILE}"
-	}
+    local FILE_NAME=${1}
+    local VERBOSE_MODE=${2}
+    local OPTIONS=${3}  
+    
+    TEMPFILE=$(mktemp /tmp/jslintr.XXXXXXXXXX) && {
+        echo "/* jslint ${OPTIONS} */" > "${TEMPFILE}"
+        cat "${FILE_NAME}" >> "${TEMPFILE}"
+        runjslint "${TEMPFILE}" "${FILE_NAME}" "$VERBOSE_MODE"
+        rm -f "${TEMPFILE}"
+    }
 }
