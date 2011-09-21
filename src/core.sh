@@ -50,7 +50,7 @@ function runjslint () {
     local VERBOSE=${VERBOSE_MODE:-1}
 
     #local LINT_RESULT=$(java -jar ${RHINO} -f ${JSLINT} ${RHINO_JSLINT} ${TEMP_FILE})
-    local LINT_RESULT=$(libs/d8 libs/jslint.js libs/v8_jslint.js -- ${TEMP_FILE})
+    local LINT_RESULT=$(${V8} ${JSLINT} ${V8_JSLINT} -- ${TEMP_FILE})
 
     if [ "$VERBOSE" -eq 0 ]; then
       concise_output "${REAL_FILE}" "${LINT_RESULT}"
