@@ -10,6 +10,5 @@
 
 
 .optionally receive JSLINTR_ROOT
-.refactor exports
 .test for not found or empy
 .make a better concise output

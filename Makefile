@@ -1,19 +1,19 @@
-export JSLINTR_ROOT=$(shell pwd -P)
+
+# Values that can be received by parameter
+export JSLINTR_ROOT ?= $(shell pwd -P)
+export TARGET ?= $(JSLINTR_ROOT)/bin/jslintr/
+
 export JSLINTR_SRC=$(JSLINTR_ROOT)/src/
 export JSLINTR_BIN=$(JSLINTR_ROOT)/bin/jslintr
 export JSLINTR_LIBS=$(JSLINTR_ROOT)/libs/
-export JSLINTR_TMP_DIR=/tmp/_jslintr/
 export JSLINTR_TMP=$(JSLINTR_TMP_DIR)/jslintr
-
 export OPTIONS_FILE=$(JSLINTR_ROOT)/etc/options.sample
-
-export DEFAULT_TARGET=$(JSLINTR_ROOT)/bin
+export JSLINTR_TMP_DIR=/tmp/_jslintr/
 
 run_builder:
 	@helpers/builder.sh "$(TARGET)" "$(JSLINTR_LIBS)" "$(OPTIONS_FILE)"
 
 .PHONY: build
-build: TARGET=$(DEFAULT_TARGET)
 build: run_builder
 
 .PHONY: create_tmp

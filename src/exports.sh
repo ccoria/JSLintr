@@ -11,9 +11,9 @@ export V8_JSLINT="$JSLINTR_LIB/v8_jslint.js"
 export KERNEL=$(uname -s)
 if [ $KERNEL == "Linux" ]
 then
-    V8="$JSLINTR_LIB/d8_linux"
+    export V8="$JSLINTR_LIB/d8_linux"
 else
-    V8="$JSLINTR_LIB/d8"
+    export V8="$JSLINTR_LIB/d8"
 fi
 
 export GREEN="\e[0;32m"

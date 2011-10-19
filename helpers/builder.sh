@@ -11,13 +11,13 @@ OPTIONS_FILE_TARGET=$BUILDER_TARGET/options
 function bootstrap () {
 	#echo " . verifying if directory exists and if has files"
 	if [ -s $BUILDER_TARGET ]; then
-		#echo " . removing all files of target directory: $BUILDER_TARGET"
+		echo "- Removing all files of target directory: $BUILDER_TARGET"
 		rm -rf $BUILDER_TARGET/*
 	else
-		echo "no files"
+		echo "- No files to delete on target"
 	fi
 	
-	mkdir $LIB_FILES_TARGET
+	mkdir -p $LIB_FILES_TARGET
 }
 
 function build_new () {
