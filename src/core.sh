@@ -1,8 +1,7 @@
 
 function has_jslint_errors () {
-    LINTRESULTS="${1}"
-
-    JSLINT_INDEX=$(expr "$LINTRESULTS" : "OK")
+    local LINTRESULTS="${1}"
+    local JSLINT_INDEX=$(expr "$LINTRESULTS" : "OK")
 
     if [ "$JSLINT_INDEX" -eq 0 ]
     then 
@@ -14,14 +13,14 @@ function has_jslint_errors () {
 
 function verbose_output () {
     # naming parameters
-    FILENAME="${1}"
-    LINTRESULTS="${2}"
+    local FILENAME="${1}"
+    local HAS_ERROR="${2}"
+    local LINTRESULTS="${3}"
 
-    if has_jslint_errors "$LINTRESULTS"
-    then
-      RESULT="${RED}FAIL${NC} - $LINTRESULTS\n\n"
+    if [ "$HAS_ERROR" -eq 1 ]; then
+        RESULT="${RED}FAIL${NC} - $LINTRESULTS\n\n"
     else
-      RESULT="${GREEN}OK${NC}\n"
+        RESULT="${GREEN}OK${NC}\n"
     fi
 
     printf "     - $(ls ${FILENAME}): ${RESULT}"
@@ -29,14 +28,14 @@ function verbose_output () {
 
 function concise_output () {
     # naming parameters
-    FILENAME="${1}"
-    LINTRESULTS="${2}"
+    local FILENAME="${1}"
+    local HAS_ERROR="${2}"
+    local LINTRESULTS="${3}"
 
-    if has_jslint_errors "$LINTRESULTS"
-    then
-      RESULT="${RED}FAIL${NC} at ${FILENAME} - $LINTRESULTS\n\n"
+    if [ "$HAS_ERROR" -eq 1 ]; then
+        RESULT="${RED}FAIL${NC} at ${FILENAME} - $LINTRESULTS\n\n"
     else
-      RESULT="${GREEN}.${NC}"
+        RESULT="${GREEN}.${NC}"
     fi
 
     printf "${RESULT}"
@@ -51,11 +50,22 @@ function runjslint () {
 
     #local LINT_RESULT=$(java -jar ${RHINO} -f ${JSLINT} ${RHINO_JSLINT} ${TEMP_FILE})
     local LINT_RESULT=$(${V8} ${JSLINT} ${V8_JSLINT} -- ${TEMP_FILE})
+    #local HAS_LINT_ERRORS=$(expr )
+
+    if has_jslint_errors "$LINT_RESULT"; then
+        #echo "fail"
+        HAS_LINT_ERRORS=1
+        add_fail
+    else
+        #echo "success"
+        HAS_LINT_ERRORS=0
+        add_success
+    fi
 
     if [ "$VERBOSE" -eq 0 ]; then
-      concise_output "${REAL_FILE}" "${LINT_RESULT}"
+        concise_output "${REAL_FILE}" "${HAS_LINT_ERRORS}" "${LINT_RESULT}"
     else
-      verbose_output "${REAL_FILE}" "${LINT_RESULT}"
+        verbose_output "${REAL_FILE}" "${HAS_LINT_ERRORS}" "${LINT_RESULT}"
     fi
 }
 

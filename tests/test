@@ -21,7 +21,7 @@ function has_pattern_in_string () {
 	echo $RES
 }
 
-export USAGE_MESSAGE="usage: jslintr \[\-v\|\-\-verbose\] target_path"
+export USAGE_MESSAGE=" Usage: jslintr \[\-v\|\-\-verbose\] \[\-o|\-\-options options_file\] \[\-tap target_tap_file\] target_path"
 test_jslintr_should_show_usage_when_called_without_params () {
 
 	local OUTPUT=$(_jslintr)
@@ -42,7 +42,10 @@ test_jslintr_should_show_usage_when_called_without_target () {
 
 test_jslintr_should_work_with_a_single_file () {
 
-	local OUTPUT=$(_jslintr "$FIXTURES/js_sample_ok.js $FIXTURES/jslintoptions")
+	local OUTPUT=$(_jslintr "-o $FIXTURES/jslintoptions $FIXTURES/js_sample_ok.js")
+    # echo "=========="
+    # echo $OUTPUT
+    # echo "=========="
 	
 	local HAS_STARTING=$(has_pattern_in_string "Starting JSLintr." "$OUTPUT")
 	assertTrue "'JSLintr started ok" "[ $HAS_STARTING ]"
@@ -53,7 +56,7 @@ test_jslintr_should_work_with_a_single_file () {
 
 test_jslintr_should_work_with_a_single_file_in_verbose_mode () {
 
-	local OUTPUT=$(_jslintr -v "$FIXTURES/js_sample_ok.js $FIXTURES/jslintoptions")
+	local OUTPUT=$(_jslintr "-o $FIXTURES/jslintoptions -v $FIXTURES/js_sample_ok.js")
     # echo "=========="
     # echo $OUTPUT
     # echo "=========="
@@ -90,8 +93,8 @@ test_jslintr_should_work_with_a_single_file_with_errors () {
 
 test_jslintr_should_work_with_a_single_file_with_errors_in_verbose_mode () {
 
-	local OUTPUT=$(_jslintr --verbose "$FIXTURES/js_sample_error.js $FIXTURES/jslintoptions")
-	# echo "=========="
+	local OUTPUT=$(_jslintr --verbose -o $FIXTURES/jslintoptions $FIXTURES/js_sample_error.js)
+    # echo "=========="
     # echo $OUTPUT
     # echo "=========="
 
@@ -105,7 +108,7 @@ test_jslintr_should_work_with_a_single_file_with_errors_in_verbose_mode () {
 	assertTrue "'JSLintr should filename" "[ $HAS_FILENAME ]"
 	
 	local HAS_DONE=$(has_pattern_in_string "JSLintr Done!" "$OUTPUT")
-	assertTrue "'JSLintr closed ok" "[ $HAS_DONE ]"
+	assertTrue "'JSLintr should closed ok: >>>>> $OUTPUT <<<<<" "[ $HAS_DONE ]"
 }
 
 test_jslintr_should_work_in_directories () {
@@ -129,6 +132,28 @@ test_jslintr_should_work_in_directories () {
 	
 	local HAS_DONE=$(has_pattern_in_string "JSLintr Complete: 2 tests done!" "$OUTPUT")
 	assertTrue "'JSLintr closed ok" "[ $HAS_DONE ]"
+}
+
+test_jslintr_should_print_results_when_work_in_directories () {
+
+	local OUTPUT=$(_jslintr "-o $FIXTURES/jslintoptions $FIXTURES")
+    # echo "=========="
+    # echo $OUTPUT
+    # echo "=========="
+    
+    local HAS_FAILS=$(has_pattern_in_string "1 failed" "$OUTPUT")
+    assertTrue "'JSLintr should print fails count" "[ $HAS_FAILS ]"
+    
+    local HAS_PASS=$(has_pattern_in_string "1 passed" "$OUTPUT")
+    assertTrue "'JSLintr should print pass count" "[ $HAS_PASS ]"
+}
+
+test_jslintr_should_generate_tap_file () {
+    local OUTPUT=$(_jslintr --tap tests\/fixtures\/jslintr.tap $FIXTURES)
+    local TAP=$(cat tests\/fixtures\/jslintr.tap)
+    
+    local HAS_TAP_VERSION=$(has_pattern_in_string "TAP version 13" "$OUTPUT")
+    assertTrue "'JSLintr should generate TAP file with version," "[ $HAS_TAP_VERSION ]"
 }
 
 . tests/bin/shunit2

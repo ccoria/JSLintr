@@ -3,34 +3,60 @@
 # Verifying usage and calling jslintr =)
 #
 function main () {
+    
+    local VERBOSE=0
+    local TAP=""
+    local TARGET=""
 	
 	###
 	# Verifying optional parameters
 	#
-	case "$1" in 
-		"-v" | "--verbose")		shift
-								VERBOSE=1
-								;;
-		*)						VERBOSE=0
-								;;
-	esac
+	while [ $# -gt 0 ]
+    do
+        # echo "$# ($1)"
+    	case "$1" in 
+    		"-v" | "--verbose")		shift
+    								VERBOSE=1
+    								;;
+            "-o" | "--options")		shift
+    								PARAMS_OPT_FILE="$1"
+    								shift
+    								;;
+    		"--tap" | "-tap")    	shift
+    								TAP="$1"
+    								shift							
+    								;;						
+    		*)                      TARGET="$1"
+    		                        break
+    								;;
+    	esac
+    done
+    
+    # echo "==========================================="
+    # echo "=== opts: $PARAMS_OPT_FILE"
+    # echo "=== verbose: $VERBOSE"
+    # echo "=== tap: $TAP"
+    # echo "=== target: $TARGET"
+    # echo "==========================================="
 	
-	local TARGET="${1}"
-	local PARAM_OPT_FILE="${2}"
+	# local TARGET="${1}"
+	# local PARAM_OPT_FILE="${2}"
 	local OPTIONS_FILE=${PARAM_OPT_FILE:-$BIN_OPTIONS_FILE}
 	local OPTIONS=""
 	local TARGET_TYPE="file"
+	local USAGE=" Usage: jslintr [-v|--verbose] [-o|--options options_file] [-tap target_tap_file] target_path\n"
 
 	if [ "$TARGET" == "" ]; then
-		echo "usage: jslintr [-v|--verbose] target_path"
+		printf "$USAGE"
 	elif [ ! -s "$TARGET" ]; then
-		echo "JSLintr: Target not found or empty"
+		printf "\n JSLintr: Target not found or empty\n"
+		printf "$USAGE"
 	else
-		FILE=$(file -b $TARGET)
-		if [ "$FILE" == "directory" ]; then
+		FILE_TARGET=$(file -b $TARGET)
+		if [ "$FILE_TARGET" == "directory" ]; then
 			# removing a possible final bar
 			TARGET="$(echo $TARGET | sed 's/\/$//g')"
-			TARGET_TYPE="directory"		
+			TARGET_TYPE="directory"
 		fi
 	    
 	    #echo "OPTIONS: $OPTIONS_FILE"
@@ -41,13 +67,13 @@ function main () {
 		    echo "No options file loaded!"
 		fi
 	
-		#echo "debug: start_jslintr $TARGET $TARGET_TYPE $VERBOSE $OPTIONS"
-		call_jslintr "$TARGET" "$TARGET_TYPE" "$VERBOSE" "$OPTIONS"
+        # echo "debug: start_jslintr $TARGET $TARGET_TYPE $VERBOSE $OPTIONS $TAP"
+		call_jslintr "$TARGET" "$TARGET_TYPE" "$VERBOSE" "$OPTIONS" "$TAP"
 	fi
 }
 
 ###
 # Everything starts here
 #
-main "${1}" "${2}" "${3}"
+main "${1}" "${2}" "${3}" "${4}" "${5}" "${6}"
 

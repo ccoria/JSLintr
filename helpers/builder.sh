@@ -26,7 +26,8 @@ function build_new () {
 	touch $JSLINTR_BIN
 	chmod u+w $JSLINTR_BIN
 	
-	#exports
+	# exports
+	# It has to be here because it depends on which is the builder target directory 
 	echo "export JSLINTR_ROOT=$BUILDER_TARGET/" > $JSLINTR_BIN
 	echo "export JSLINTR_LIB=$LIB_FILES_TARGET" >> $JSLINTR_BIN
 	echo "export BIN_OPTIONS_FILE=$OPTIONS_FILE_TARGET" >> $JSLINTR_BIN
