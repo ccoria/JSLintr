@@ -55,11 +55,11 @@ function runjslint () {
     if has_jslint_errors "$LINT_RESULT"; then
         #echo "fail"
         HAS_LINT_ERRORS=1
-        add_fail
+        add_fail "${REAL_FILE}"
     else
         #echo "success"
         HAS_LINT_ERRORS=0
-        add_success
+        add_success "${REAL_FILE}"
     fi
 
     if [ "$VERBOSE" -eq 0 ]; then

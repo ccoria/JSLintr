@@ -67,7 +67,7 @@ function main () {
 		    echo "No options file loaded!"
 		fi
 	
-        # echo "debug: start_jslintr $TARGET $TARGET_TYPE $VERBOSE $OPTIONS $TAP"
+        #echo "debug: start_jslintr $TARGET $TARGET_TYPE $VERBOSE $OPTIONS $TAP"
 		call_jslintr "$TARGET" "$TARGET_TYPE" "$VERBOSE" "$OPTIONS" "$TAP"
 	fi
 }

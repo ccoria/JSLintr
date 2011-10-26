@@ -21,6 +21,10 @@ function has_pattern_in_string () {
 	echo $RES
 }
 
+oneTimeTearDown () {
+    rm tests/fixtures/*.tap
+}
+
 export USAGE_MESSAGE=" Usage: jslintr \[\-v\|\-\-verbose\] \[\-o|\-\-options options_file\] \[\-tap target_tap_file\] target_path"
 test_jslintr_should_show_usage_when_called_without_params () {
 
@@ -148,12 +152,32 @@ test_jslintr_should_print_results_when_work_in_directories () {
     assertTrue "'JSLintr should print pass count" "[ $HAS_PASS ]"
 }
 
-test_jslintr_should_generate_tap_file () {
-    local OUTPUT=$(_jslintr --tap tests\/fixtures\/jslintr.tap $FIXTURES)
-    local TAP=$(cat tests\/fixtures\/jslintr.tap)
+test_jslintr_should_generate_tap_file_without_name () {
+    local OUTPUT=$(_jslintr --tap tests\/fixtures\/ $FIXTURES)
     
-    local HAS_TAP_VERSION=$(has_pattern_in_string "TAP version 13" "$OUTPUT")
+    local FILE_EXISTS=$( [ -f tests/fixtures/jslintr.tap ] && echo 1 )
+    assertTrue "'JSLintr should generate TAP file even if name is not specified," "[ $FILE_EXISTS ]"
+}
+
+test_jslintr_should_generate_tap_file () {
+    local OUTPUT=$(_jslintr --tap tests\/fixtures\/test_jslintr.tap $FIXTURES)
+    local TAP=$(cat tests\/fixtures\/test_jslintr.tap)
+    
+    # echo "=========="
+    # echo $TAP
+    # echo "=========="
+    
+    local HAS_TAP_VERSION=$(has_pattern_in_string "TAP version 13" "$TAP")
     assertTrue "'JSLintr should generate TAP file with version," "[ $HAS_TAP_VERSION ]"
+    
+    local HAS_TOTAL=$(has_pattern_in_string "1..2" "$TAP")
+    assertTrue "'JSLintr should generate TAP file with count header," "[ $HAS_TOTAL ]"
+    
+    local HAS_FILE1=$(has_pattern_in_string "not ok 1 - $FIXTURES/js_sample_error.js" "$TAP")
+    assertTrue "'TAP file should show fail," "[ $HAS_FILE1 ]"
+    
+    local HAS_FILE2=$(has_pattern_in_string "ok 2 - $FIXTURES/js_sample_ok.js" "$TAP")
+    assertTrue "'TAP file should show success," "[ $HAS_FILE2 ]"
 }
 
 . tests/bin/shunit2
